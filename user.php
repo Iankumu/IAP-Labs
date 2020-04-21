@@ -36,9 +36,9 @@ class user implements Crud{
 
     public function readAll(){
 
-        return null;
-        
-        
+        $con = new DBconnector;
+        $result = mysqli_query($con->conn,"SELECT * FROM users") or die("Error:" . mysqli_connect_error());
+        return $result;    
     }
     public function readUnique(){
         return null;
