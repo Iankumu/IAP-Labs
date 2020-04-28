@@ -18,16 +18,21 @@ if(isset($_POST['btn-save'])){
             header("Refresh:0");
             die();
     }
+       
+    if(!$user->isUserExist()){
         $res = $user->save();
         
         if($res){
             echo "Save operation was successful";
-            header("Location:login.php");
         }else{
             echo "An error occured!";
         }
-        $con->closeDatabase();
+    }else{
+        echo "Username already exists";
     }
+    $con->closeDatabase();
+}
+        
  
 
 if(isset($_GET['view'])) { 
