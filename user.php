@@ -1,37 +1,98 @@
 <?php
 
 include "Crud.php";
+include "authenticator.php";
 include_once "DBconnector.php";
-class user implements Crud{
+class user implements Crud,Authenticator{
     private $user_id;
     private $first_name;
     private $last_name;
     private $city_name;
+    private $username;
+    private $password;
 
     
 
-    function __construct($first_name,$last_name,$city_name){
+    function __construct($first_name,$last_name,$city_name,$username,$password){
         $this->first_name=$first_name;
         $this->last_name=$last_name;
         $this->city_name=$city_name;
-    }
-    public function setUserId($user_id){
-        $this->user_id=$user_id;
+        $this->username=$username;
+        $this->password=$password;
     }
 
-    public function getUserId(){
-        return $this->$user_id;
+    
+    public static function create(){
+        $instance = new self($first_name, $last_name, $city_name, $username, $password);
+        return $instance;
     }
+
+    public function setUsername($username){
+        $this->username = $username;
+    }
+
+    public function getUsername(){
+        return $this->username;
+    }
+
+    public function setPassword($password){
+        $this->password = $password;
+    }
+
+    public function getPassword(){
+        return $this->password;
+    }
+
+    public function setUserId ($user_id){
+        $this->user_id = $user_id;
+    }
+
+    public function getUserId (){
+        return $this->user_id;
+    }
+    public function isUserExist(){
+        $username = $this->username;
+        $con = new DBConnector;
+        $found = false;
+        $res = mysqli_query($con->conn, "SELECT * FROM users") or die("Error: " .mysqli_error());
+
+        while($row = mysqli_fetch_array($res)){
+            if($row['username'] == $username){
+                $found = true;
+            }
+        }
+
+        $con->closeDatabase();
+        return $found;
+    }
+   
 
     public function save(){
         $fn=$this->first_name;
         $ln=$this->last_name;
         $cn=$this->city_name;
+        $uname = $this->username;
+        $this->hashedPassword();
+        $pass = $this->password;
 
         $con = new DBconnector;
 
-        $res=mysqli_query($con->conn,"INSERT INTO users(firstname,lastname,user_city) VALUES('$fn','$ln','$cn')") or die("Error:" . mysqli_connect_error());
+        $res=mysqli_query($con->conn,"INSERT INTO users(firstname,lastname,user_city,username,user_password) VALUES('$fn','$ln','$cn','$uname','$pass')") or die("Error:" . mysqli_connect_error());
         return $res;
+    }
+    public function isPasswordCorrect()
+    {
+        $con = new DBconnector;
+        $found = false;
+        $result = mysqli_query($con->conn,"SELECT * FROM users") or die("Error:" . mysqli_connect_error());
+        while ($row = mysqli_fetch_array($result))
+        {
+            if (password_verify($this->getPassword(),$row['user_password'])&& $this->getUsername()==$row['username']){
+                $found = true;
+            }
+        }
+        $con->closeDatabase();
+        return $found;  
     }
 
     public function readAll(){
@@ -54,6 +115,42 @@ class user implements Crud{
     }
     public function removeAll(){
         return null;
+    }
+    public function valiteForm(){
+        $fn = $this->first_name;
+        $ln = $this->last_name;
+        $city = $this->city_name;
+
+        if($fn =="" || $ln=="" || $city==""){
+            return false;
+        }
+        return true;
+    }
+    public function CreateFormErrorSessions(){
+        session_start();
+        $_SESSION['form_errors']="All Fields are required";
+    }
+    public function hashedPassword(){
+        $this->password = password_hash($this->password,PASSWORD_DEFAULT);
+    }
+    
+
+    public function login()
+    {
+        if($this->isPasswordCorrect()){
+            header("Location:private_page.php");
+        }
+    }
+    public function createUserSession(){
+        session_start();
+        $_SESSION['username'] = $this->getUsername();
+    }
+    public function logout()
+    {
+        session_start();
+        unset($_SESSION['username']);
+        session_destroy();
+        header("Location:lab1.php");
     }
 
 

@@ -7,29 +7,37 @@ if(isset($_POST['btn-save'])){
     $first_name=$_POST['first_name'];
     $last_name=$_POST['last_name'];
     $city=$_POST['city_name'];
+    $uname=$_POST['username'];
+    $pass=$_POST['password'];
 
 
-    $user = new user($first_name,$last_name,$city);
-    $res=$user->save();
-
-
-    if($res){
-        
-        echo "Save Operation was Successful";
-        $close = $con->closeDatabase();
-    }
-    else
+    $user = new user($first_name,$last_name,$city,$uname,$pass);
+    if (!$user->valiteForm())
     {
-        echo "An Error Occured";
+            $user->CreateFormErrorSessions();
+            header("Refresh:0");
+            die();
     }
-} 
+        $res = $user->save();
+        
+        if($res){
+            echo "Save operation was successful";
+            header("Location:login.php");
+        }else{
+            echo "An error occured!";
+        }
+        $con->closeDatabase();
+    }
+ 
 
 if(isset($_GET['view'])) { 
     $first_name=0;
     $last_name=0;
     $city=0;
+    $uname=0;
+    $pass = 0;
 
-    $user = new User($first_name, $last_name, $city);
+    $user = new User($first_name, $last_name, $city,$uname,$pass);
     $res = $user->readAll();
     
     echo "<!DOCTYPE html>
@@ -46,6 +54,7 @@ if(isset($_GET['view'])) {
                                 <th>First Name</th>
                                 <th>Last Name</th>
                                 <th>City</th>
+                                <th>Username</th>
                             </tr>
 
                             <tr>";		
@@ -55,12 +64,16 @@ if(isset($_GET['view'])) {
                                         $first_name = $row['firstname'];
                                         $last_name = $row['lastname'];
                                         $city = $row['user_city'];
+                                        $uname = $row['username'];
+                                        
 
                                     echo "<tr>
                                     <td>".$user_id."</td>
                                     <td>".$first_name."</td>
                                     <td>".$last_name."</td>
                                     <td>".$city."</td>
+                                    <td>".$uname."</td>
+                                    
                                     </tr>";
                                     }
                                     
@@ -79,16 +92,28 @@ if(isset($_GET['view'])) {
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+<head>  
     <title>Title Goes Here</title>
+    <script type="text/javascript" src="validate.js"></script>
+    <link rel="stylesheet" type="text/css" href="validate.css">
 </head>
 <body>
-    <form method="post" action="<?=$_SERVER['PHP_SELF']?>">
+    <form method="post" name="user_details" id="user_details" onsubmit="return validateForm()" action="<?=$_SERVER['PHP_SELF']?>">
     <div>
-    <table>
+    <table align = "center">
+    <tr>
+    <td>
+    <div id="form-errors">
+    <?php 
+    session_start();
+    if (!empty($_SESSION['form_errors'])){
+        echo " ".$_SESSION['form_errors'];
+        unset($_SESSION['form_errors']);
+    }
+    ?>
+    </div>
+    </td>
+    </tr>
     <tr>
     <td><input type="text"name="first_name"required placeholder="First Name"></td>
     </tr>
@@ -102,14 +127,27 @@ if(isset($_GET['view'])) {
     </tr>
 
     <tr>
+    <td><input type="text"name="username"required placeholder="Username"></td>
+    </tr>
+
+    <tr>
+    <td><input type="password"name="password"required placeholder="Password"></td>
+    </tr>
+
+    <tr>
     <td><button type="submit"name="btn-save"><strong>SAVE</strong></button></td>
     </tr>
+
+    <tr>
+    <td><a href="login.php">Login</a></td>
+    </tr>
+
+    <tr>
+    <td> <a href='lab1.php?view=true'>View Records</a></td>
+    </tr>
+
     </table>
 
-    </div>
-
-    <div>
-    <a href='lab1.php?view=true'>View Records</a>
     </div>
 
     </form>
