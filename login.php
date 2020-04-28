@@ -34,7 +34,7 @@
                     <td><input type="text" name="username" placeholder="Username" required/></td>
                 </tr>
                 <tr>
-                    <td><input type="text" name="password" placeholder="Password" required/></td>
+                    <td><input type="password" name="password" placeholder="Password" required/></td>
                 </tr>
                 <tr>
                     <td><button type="submit" name="btn-login"><strong>LOGIN</strong></button></td>
