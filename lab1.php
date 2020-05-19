@@ -1,6 +1,7 @@
 <?php
 include_once 'DBconnector.php';
 include_once 'user.php';
+include_once 'fileUploader.php';
 $con = new DBconnector;
 
 if(isset($_POST['btn-save'])){
@@ -9,9 +10,24 @@ if(isset($_POST['btn-save'])){
     $city=$_POST['city_name'];
     $uname=$_POST['username'];
     $pass=$_POST['password'];
+    $uploader = new FileUploader();
+
+    if (isset($_FILES['filetoUpload'])) {
+
+        $filename = $_FILES['filetoUpload']['name'];
+        $file_tmp = $_FILES['filetoUpload']['tmp_name'];
+        $filesize = $_FILES['filetoUpload']['size'];       
 
 
-    $user = new user($first_name,$last_name,$city,$uname,$pass);
+        $uploader->setOriginalName($filename);
+        $uploader->setFileSize($filesize);
+        $uploader->setfileTmpName($file_tmp);
+        }
+        $image = "uploads/".basename($filename);
+    
+    $user = new user($first_name,$last_name,$city,$uname,$pass,$image);
+        $uploader->uploadFile();
+    
     if (!$user->valiteForm())
     {
             $user->CreateFormErrorSessions();
@@ -22,6 +38,8 @@ if(isset($_POST['btn-save'])){
     if(!$user->isUserExist()){
         $res = $user->save();
         
+
+        
         if($res){
             echo "Save operation was successful";
         }else{
@@ -31,7 +49,8 @@ if(isset($_POST['btn-save'])){
         echo "Username already exists";
     }
     $con->closeDatabase();
-}
+    }
+
         
  
 
@@ -100,10 +119,14 @@ if(isset($_GET['view'])) {
 <head>  
     <title>Title Goes Here</title>
     <script type="text/javascript" src="validate.js"></script>
+    <script type="text/javascript" src="timezone.js"></script>
+    <script type = "text/javascript" 
+         src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js">
+      </script>
     <link rel="stylesheet" type="text/css" href="validate.css">
 </head>
 <body>
-    <form method="post" name="user_details" id="user_details" onsubmit="return validateForm()" action="<?=$_SERVER['PHP_SELF']?>">
+    <form method="post" name="user_details" id="user_details" enctype="multipart/form-data" onsubmit="return validateForm()" action="<?=$_SERVER['PHP_SELF']?>">
     <div>
     <table align = "center">
     <tr>
@@ -140,7 +163,17 @@ if(isset($_GET['view'])) {
     </tr>
 
     <tr>
+    <td>Profile Image: <input type="file"name="filetoUpload" id ="filetoUpload"></td>
+    </tr>
+
+    <tr>
     <td><button type="submit"name="btn-save"><strong>SAVE</strong></button></td>
+    </tr>
+
+    <tr>
+    <input type = "hidden" name  ="utc_timestamp" id ="utc_timestamp" value = "">
+    <input type = "hidden" name  ="time_zone_offset" id ="time_zone_offset" value = "">
+    
     </tr>
 
     <tr>

@@ -3,6 +3,7 @@
 include "Crud.php";
 include "authenticator.php";
 include_once "DBconnector.php";
+include_once "fileUploader.php";
 class user implements Crud,Authenticator{
     private $user_id;
     private $first_name;
@@ -10,20 +11,23 @@ class user implements Crud,Authenticator{
     private $city_name;
     private $username;
     private $password;
+    private $profileImage;
+   
 
     
 
-    function __construct($first_name,$last_name,$city_name,$username,$password){
+    function __construct($first_name,$last_name,$city_name,$username,$password,$profileImage){
         $this->first_name=$first_name;
         $this->last_name=$last_name;
         $this->city_name=$city_name;
         $this->username=$username;
         $this->password=$password;
+        $this->profileImage=$profileImage;
     }
 
     
     public static function create(){
-        $instance = new self($first_name, $last_name, $city_name, $username, $password);
+        $instance = new self($first_name, $last_name, $city_name, $username, $password,$profileImage);
         return $instance;
     }
 
@@ -50,6 +54,15 @@ class user implements Crud,Authenticator{
     public function getUserId (){
         return $this->user_id;
     }
+
+    public function setProfile($profileImage){
+        $this->profileImage = $profileImage;
+    }
+
+    public function getProfile(){
+        return $this->profileImage;
+    }
+
     public function isUserExist(){
         $username = $this->username;
         $con = new DBConnector;
@@ -68,16 +81,16 @@ class user implements Crud,Authenticator{
    
 
     public function save(){
+        $con= new DBconnector();
         $fn=$this->first_name;
         $ln=$this->last_name;
         $cn=$this->city_name;
         $uname = $this->username;
         $this->hashedPassword();
         $pass = $this->password;
+        $filename = $this->profileImage;
 
-        $con = new DBconnector;
-
-        $res=mysqli_query($con->conn,"INSERT INTO users(firstname,lastname,user_city,username,user_password) VALUES('$fn','$ln','$cn','$uname','$pass')") or die("Error:" . mysqli_connect_error());
+        $res=mysqli_query($con->conn,"INSERT INTO users(firstname,lastname,user_city,username,user_password,mage) VALUES('$fn','$ln','$cn','$uname','$pass','$filename')") or die("Error:" . mysqli_connect_error());
         return $res;
     }
     public function isPasswordCorrect()
