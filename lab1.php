@@ -10,6 +10,10 @@ if(isset($_POST['btn-save'])){
     $city=$_POST['city_name'];
     $uname=$_POST['username'];
     $pass=$_POST['password'];
+
+    $time_zone_offset = $_POST['time_zone_offset'];
+    $utc_timestamp = $_POST['utc_timestamp'];
+
     $uploader = new FileUploader();
 
     if (isset($_FILES['filetoUpload'])) {
@@ -25,7 +29,7 @@ if(isset($_POST['btn-save'])){
         }
         $image = "uploads/".basename($filename);
     
-    $user = new user($first_name,$last_name,$city,$uname,$pass,$image);
+    $user = new user($first_name,$last_name,$city,$uname,$pass,$image,$time_zone_offset,$utc_timestamp);
         $uploader->uploadFile();
     
     if (!$user->valiteForm())
@@ -118,12 +122,10 @@ if(isset($_GET['view'])) {
 <html lang="en">
 <head>  
     <title>Title Goes Here</title>
+    <link rel="stylesheet" type="text/css" href="validate.css">
+    <script type="text/JavaScript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js" ></script>
     <script type="text/javascript" src="validate.js"></script>
     <script type="text/javascript" src="timezone.js"></script>
-    <script type = "text/javascript" 
-         src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js">
-      </script>
-    <link rel="stylesheet" type="text/css" href="validate.css">
 </head>
 <body>
     <form method="post" name="user_details" id="user_details" enctype="multipart/form-data" onsubmit="return validateForm()" action="<?=$_SERVER['PHP_SELF']?>">
@@ -145,49 +147,36 @@ if(isset($_GET['view'])) {
     <tr>
     <td><input type="text"name="first_name"required placeholder="First Name"></td>
     </tr>
-    
     <tr>
     <td><input type="text"name="last_name"required placeholder="Last Name"></td>
     </tr>
-    
     <tr>
     <td><input type="text"name="city_name"required placeholder="City"></td>
     </tr>
-
     <tr>
     <td><input type="text"name="username"required placeholder="Username"></td>
     </tr>
-
     <tr>
     <td><input type="password"name="password"required placeholder="Password"></td>
     </tr>
-
     <tr>
     <td>Profile Image: <input type="file"name="filetoUpload" id ="filetoUpload"></td>
     </tr>
-
     <tr>
     <td><button type="submit"name="btn-save"><strong>SAVE</strong></button></td>
     </tr>
-
     <tr>
     <input type = "hidden" name  ="utc_timestamp" id ="utc_timestamp" value = "">
     <input type = "hidden" name  ="time_zone_offset" id ="time_zone_offset" value = "">
-    
     </tr>
-
     <tr>
     <td><a href="login.php">Login</a></td>
     </tr>
-
     <tr>
     <td> <a href='lab1.php?view=true'>View Records</a></td>
     </tr>
-
     </table>
-
     </div>
-
     </form>
 </body>
 </html>

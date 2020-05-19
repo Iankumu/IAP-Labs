@@ -12,22 +12,23 @@ class user implements Crud,Authenticator{
     private $username;
     private $password;
     private $profileImage;
-   
+    private $utc_timestamp;
+    private $time_zone_offset;
 
-    
-
-    function __construct($first_name,$last_name,$city_name,$username,$password,$profileImage){
+    function __construct($first_name,$last_name,$city_name,$username,$password,$profileImage,$time_zone_offset,$utc_timestamp){
         $this->first_name=$first_name;
         $this->last_name=$last_name;
         $this->city_name=$city_name;
         $this->username=$username;
         $this->password=$password;
         $this->profileImage=$profileImage;
+        $this->time_zone_offset=$time_zone_offset;
+        $this->utc_timestamp=$utc_timestamp;
     }
 
     
     public static function create(){
-        $instance = new self($first_name, $last_name, $city_name, $username, $password,$profileImage);
+        $instance = new self($first_name, $last_name, $city_name, $username, $password,$profileImage,$time_zone_offset,$utc_timestamp);
         return $instance;
     }
 
@@ -63,6 +64,22 @@ class user implements Crud,Authenticator{
         return $this->profileImage;
     }
 
+    public function setutc_timestamp($utc_timestamp){
+        $this->utc_timestamp = $utc_timestamp;
+    }
+
+    public function getutc_timestamp(){
+        return $this->utc_timestamp;
+    }
+
+    public function settime_zone_offset($time_zone_offset){
+        $this->time_zone_offset = $time_zone_offset;
+    }
+
+    public function gettime_zone_offset(){
+        return $this->time_zone_offset;
+    }
+
     public function isUserExist(){
         $username = $this->username;
         $con = new DBConnector;
@@ -89,8 +106,10 @@ class user implements Crud,Authenticator{
         $this->hashedPassword();
         $pass = $this->password;
         $filename = $this->profileImage;
+        $utc = $this->utc_timestamp;
+        $time = $this->time_zone_offset;
 
-        $res=mysqli_query($con->conn,"INSERT INTO users(firstname,lastname,user_city,username,user_password,mage) VALUES('$fn','$ln','$cn','$uname','$pass','$filename')") or die("Error:" . mysqli_connect_error());
+        $res=mysqli_query($con->conn,"INSERT INTO users(firstname,lastname,user_city,username,user_password,filepath,time_zone,utc) VALUES('$fn','$ln','$cn','$uname','$pass','$filename','$time','$utc')") or die("Error:" . mysqli_connect_error());
         return $res;
     }
     public function isPasswordCorrect()
