@@ -64,6 +64,7 @@ if(isset($_GET['view'])) {
     $city=0;
     $uname=0;
     $pass = 0;
+    
 
     $user = new User($first_name, $last_name, $city,$uname,$pass);
     $res = $user->readAll();
