@@ -33,20 +33,20 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
             $response_array = ["success"=>0,"message"=>"Wrong API Key"];
             echo json_encode($response_array);
         }
-    }elseif($_SERVER['REQUEST_METHOD']==="GET")
+    }else if($_SERVER['REQUEST_METHOD']==="GET")
     {
         $api_key_correct = false;
         $headers = apache_request_headers();
         $header_api_key = $headers['Authorization'];
         $api->setUserApiKey($header_api_key);
-        $api_key_correct = $api->checkApiKey();
+        $api_key_correct = $api->checkAPIKey();
 
         if ($api_key_correct) {
             $order_id = $_GET['order_id'];
 
-            $oStatus = $api->checkOrderStatus($order_id);
+            $orderStatus = $api->checkOrderStatus($order_id);
 
-            $response_array = ['success' => 1, 'message' => $oStatus ];
+            $response_array = ['success' => 1, 'message' => $orderStatus ];
             header('Content-Type: application/json; charset=UTF-8');
             echo json_encode($response_array);
 

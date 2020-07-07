@@ -70,40 +70,28 @@ class APIHandler{
     {
         $this->status = $status;
     }
-
-    /**
-     * @return mixed
-     */
-    public function getUserApiKey()
-    {
-        return $this->user_api_key;
-    }
-
-    /**
-     * @param mixed $user_api_key
-     */
     public function setUserApiKey($user_api_key)
     {
         $this->user_api_key = $user_api_key;
     }
 
-    public function createOrder(){
-        $con = new DBconnector();
-        $res = mysqli_query($con,"INSERT INTO orders(order_name,units,unit_price,orer_status)VALUES '$this->meal_name',$this->meal_units,'$this->unit_price','$this->status'")or die("Error".mysqli_error());
+    public function createOrder()
+    {
+        $con = new DBConnector();
+        $res = mysqli_query($con->conn, "INSERT INTO orders(order_name,units,unit_price,order_status) VALUES ('$this->meal_name','$this->meal_units','$this->unit_price','$this->status')") or die("Error: ".mysqli_error($con->conn));
         return $res;
     }
     public function checkOrderStatus($id){
         $con = new DBConnector();
-        $order = mysqli_query($con->conn, "SELECT * FROM orders WHERE order_id = '$id' ")->fetch_assoc();
-
-        return $order['order_status'];
+        $order = mysqli_query($con->conn,"SELECT order_status FROM orders WHERE order_id='$id'");
+        return $order;
     }
-    public function fetchAllOrders(){}
+
     public function checkAPIKey(){
         $con = new DBConnector();
         $api = mysqli_query($con->conn, "SELECT * FROM api_keys WHERE api_key = '$this->user_api_key' ");
         return $api;
+
     }
-    public function checkContentType(){}
 
 }
