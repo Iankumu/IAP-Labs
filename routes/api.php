@@ -17,3 +17,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+//read all reviews of a car of some id
+Route::get('reviews/{id}','ReviewsController@readAllWithId');
+//read car details of a review of some id
+Route::get('car_details/{id}','ReviewsController@getCarDetails');
+//return all reviews of a given car in JSON format.
+Route::get('getReviews/{id}','ReviewsController@getCarReviews');

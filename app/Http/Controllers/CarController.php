@@ -17,14 +17,20 @@ class CarController extends Controller
 
     }
     public function newCar(Request $request){
+        //checks and validates the form
+        $this->validate($request,[
+            'model'=>'required|unique',
+            'make'=>'required|unique',
+            'produced_on'=>'required|unique'
+        ]);
+
         $car = new Car;
         $car->model= request('model');
         $car->make= request('make');
         $car->produced_on= request('produced_on');
         $car->save();
-        $request->session()->flash('form_status','Form submission was successful');
 
-        return redirect('/');
+        return redirect('/')->with('success','Form submission was successful');
 
     }
 }
